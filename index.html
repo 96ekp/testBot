@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Chatbot</title>
+<!-- <link rel="stylesheet" href="style.css"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+<style>
+body {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0; /* Ensure body takes full height */
+}
+
+#chat-container {
+  display: flex;
+  flex-direction: column; /* Stack chat history and form */
+  justify-content: space-between; /* Pushes form to the bottom */
+  background-color: #EEEDEB;
+  border-radius: 10px;
+  padding: 20px; /* Adjusted padding */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  width: 60%;
+  height: 80vh; /* Adjusted height */
+  max-height: 80vh; /* Ensure it doesn't grow beyond viewport */
+  overflow: hidden; /* Hide overflow */
+}
+#chat-container h1 {
+
+  color: black; /* Assuming you want the text color to be white for contrast */
+  text-align: center; /* Centers the text horizontally */
+  width: 100%; /* Ensures the background color spans the entire width of the container */
+  margin-top: 0; /* Removes any default top margin */
+  padding: 10px 0; /* Adds some vertical padding for visual appeal */
+}
+
+
+#chat-history {
+  overflow-y: auto;
+  flex-grow: 1; /* Allows it to expand */
+  margin-bottom: 10px; /* Space above the form */
+}
+
+/* Adjusted message styles for readability */
+.user-message, .bot-message {
+  display: block;
+  max-width: 80%;
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+}
+
+.user-message {
+  background-color: #B4B4B8;
+  margin-left: auto; /* Aligns user messages to the right */
+  margin-right: 10px;
+}
+
+.bot-message {
+  background-color: #e0f0e0;
+  margin-right: auto; /* Aligns bot messages to the left */
+  margin-left: 10px;
+}
+
+form {
+  display: flex;
+  position: relative; /* Adjusted to ensure form stays at bottom */
+}
+
+input, button {
+  margin-top: 0; /* Remove the top margin */
+}
+
+
+input {
+  flex-grow: 1;
+  margin-right: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background: url('send-icon.png') no-repeat center; /* Use your icon file here */
+  background-size: contain; /* Scale the image to fit */
+  border: none;
+  width: 40px; /* Adjust based on your icon size */
+  height: 40px; /* Adjust based on your icon size */
+  cursor: pointer;
+  padding: 0; /* Remove padding */
+}
+
+
+#loader {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+button:disabled {
+  opacity: 0.5; /* Make button look faded when disabled */
+  cursor: not-allowed; /* Change cursor to indicate the action is not allowed */
+}
+
+button:not(:disabled) {
+  opacity: 1; /* Fully opaque when enabled */
+  cursor: pointer;
+}
+.image-upload-label {
+  cursor: pointer;
+  margin-right: 10px; /* Adjust spacing as needed */
+  /* Add more styling here to match your design */
+}
+
+
+
+
+</style>
+</head>
+<body>
+  <div id="chat-container">
+  <h1> Assistance Chatbot</h1>
+  <div id="chat-history"></div>
+  <form id="chat-form">
+    <input type="text" id="user-input" placeholder="Enter your message">
+    <input type="file" id="image-upload" style="display: none;" accept="image/*">
+    <label for="image-upload" class="image-upload-label">
+      <i class="fas fa-image" style="color: blue; font-size:36px;"></i>
+    </label>
+    <button type="submit" aria-label="Send">
+      <i class="fas fa-arrow-alt-circle-right" style="color: blue; font-size:36px;"></i>
+    </button>
+    
+  </form>
+</div>
+<!-- <div id="loader">
+  <img src="loader.gif" width="150px" alt="Loading...">
+</div> -->
+
+<div id="loader" style="display: none;">
+  <?xml version="1.0" encoding="utf-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin: auto; background: none; display: block; shape-rendering: auto;" width="131px" height="131px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+  <circle cx="84" cy="50" r="10" fill="#0051a2">
+      <animate attributeName="r" repeatCount="indefinite" dur="0.6097560975609756s" calcMode="spline" keyTimes="0;1" values="10;0" keySplines="0 0.5 0.5 1" begin="0s"></animate>
+      <animate attributeName="fill" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="discrete" keyTimes="0;0.25;0.5;0.75;1" values="#0051a2;#89bff8;#408ee0;#1b75be;#0051a2" begin="0s"></animate>
+  </circle><circle cx="16" cy="50" r="10" fill="#0051a2">
+    <animate attributeName="r" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="0;0;10;10;10" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="0s"></animate>
+    <animate attributeName="cx" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="16;16;16;50;84" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="0s"></animate>
+  </circle><circle cx="50" cy="50" r="10" fill="#1b75be">
+    <animate attributeName="r" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="0;0;10;10;10" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="-0.6097560975609756s"></animate>
+    <animate attributeName="cx" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="16;16;16;50;84" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="-0.6097560975609756s"></animate>
+  </circle><circle cx="84" cy="50" r="10" fill="#408ee0">
+    <animate attributeName="r" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="0;0;10;10;10" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="-1.2195121951219512s"></animate>
+    <animate attributeName="cx" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="16;16;16;50;84" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="-1.2195121951219512s"></animate>
+  </circle><circle cx="16" cy="50" r="10" fill="#89bff8">
+    <animate attributeName="r" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="0;0;10;10;10" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="-1.8292682926829267s"></animate>
+    <animate attributeName="cx" repeatCount="indefinite" dur="2.4390243902439024s" calcMode="spline" keyTimes="0;0.25;0.5;0.75;1" values="16;16;16;50;84" keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" begin="-1.8292682926829267s"></animate>
+  </circle>
+  <!-- [ldio] generated by https://loading.io/ --></svg>
+</div>
+
+
+<script>
+  const chatHistory = document.getElementById('chat-history');
+  const userInput = document.getElementById('user-input');
+  const sendButton = document.querySelector('button[type="submit"]'); // Get the send button
+  const form = document.getElementById('chat-form');
+  
+  userInput.addEventListener('input', () => {
+    // Disable the send button if the input field is empty, enable otherwise
+    sendButton.disabled = !userInput.value.trim();
+  });
+  
+  async function sendMessage() {
+    const userMessage = userInput.value.trim(); // Use trim to remove whitespace
+    if (!userMessage) return; // Prevent sending empty messages
+    userInput.value = ''; // Clear input field after sending
+    sendButton.disabled = true; // Disable button again after sending
+    console.log(userMessage);
+    try {
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userInput: userMessage }),
+      });
+  
+      const data = await response.json();
+      console.log(data);
+      const botMessage = data.response;
+      console.log(botMessage);
+      // Add chat message to the chat history
+      chatHistory.innerHTML += `<div class="user-message">${userMessage}</div>`;
+      chatHistory.innerHTML += `<div class="bot-message">${botMessage}</div>`;
+  
+      // Scroll to the bottom of the chat history
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+    } catch (error) {
+      console.error('Error:', error);
+      // Handle errors gracefully, e.g., display an error message to the user
+    }
+  }
+  
+  form.addEventListener('submit', (event) => {
+    event.preventDefault(); // Prevent form submission
+    const loader = document.getElementById('loader');
+    loader.style.display = 'block'; // Show the loader
+    sendMessage().finally(() => {
+      loader.style.display = 'none'; // Hide the loader after the message is sent
+    });
+  });
+  
+  // Initialize button state based on current input
+  sendButton.disabled = !userInput.value.trim();
+
+
+
+
+  document.getElementById('image-upload').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // Implement file upload here. This could involve creating a FormData object and sending it to your server via fetch or XMLHttpRequest.
+    console.log(file.name); // Example: log the file name
+
+    // Example: Append file to FormData and send it
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch('/upload-image', { // Adjust endpoint as necessary
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data); // Handle response data
+      // Update chat history with the image or a link to the image
+    })
+    .catch(error => {
+      console.error('Error uploading image:', error);
+    });
+  }
+});
+
+  
+  </script>
+  
+<!-- <script src="index.js"></script> -->
+</body>
+</html>
