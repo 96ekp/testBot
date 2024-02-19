@@ -10,3 +10,7 @@
      API_KEY="Paste API Key here"
 
 4. Get API Key : https://aistudio.google.com/app/apikey
+
+
+5. to run a code type: node server.js
+6. Go to your brower and type: localhost:3000 // you can change ports
